@@ -27,8 +27,6 @@
 
 #include <Arduino.h>
 
-#include "Valenttiny_modes.h"
-
 // EEPROM
 #include <EEPROM.h>
 #define STATE_ADDRESS 0
@@ -56,7 +54,6 @@ void setup()
     pixels.begin();
     pixels.clear();
 
-#ifdef EEPROM_h
     state = EEPROM.read(STATE_ADDRESS);
     brightness = EEPROM.read(BRIGHTNESS_ADDRESS);
     if (state >= NUM_STATES || state < 0)
@@ -67,7 +64,6 @@ void setup()
     {
         brightness = 0.5;
     }
-#endif
 
     return;
 }
@@ -80,48 +76,38 @@ void loop()
 
     if (button1.click())
     {
-        state++;
-        if (state >= NUM_STATES)
-        {
-            state = 0;
-        }
-#ifdef EEPROM_h
+        state = (state + 1) % NUM_STATES;
+
         EEPROM.write(STATE_ADDRESS, state);
-#endif
     }
+
     if (button2.click())
     {
-        state--;
-        if (state < 0)
-        {
-            state = NUM_STATES - 1;
-        }
-#ifdef EEPROM_h
+        state = (state + NUM_STATES - 1) % NUM_STATES;
+
         EEPROM.write(STATE_ADDRESS, state);
-#endif
     }
 
     if (button1.step())
     {
-        brightness += 0.1;
-        if (brightness > 1.0)
+        brightness++;
+        if (brightness > 1)
         {
-            brightness = 1.0;
+            brightness = 1;
         }
-#ifdef EEPROM_h
+
         EEPROM.write(BRIGHTNESS_ADDRESS, brightness);
-#endif
     }
+
     if (button2.step())
     {
-        brightness -= 0.1;
-        if (brightness < 0.0)
+        brightness--;
+        if (brightness < 0)
         {
-            brightness = 0.0;
+            brightness = 0;
         }
-#ifdef EEPROM_h
+
         EEPROM.write(BRIGHTNESS_ADDRESS, brightness);
-#endif
     }
 
     if (state == 0)
@@ -131,37 +117,72 @@ void loop()
     else if (state == 1)
     {
         // Red
-        applyColour(pixels, 255 * brightness, 0, 0);
+        pixels.fill(pixels.Color(255 * brightness, 0, 0));
     }
     else if (state == 2)
     {
         // Yellow
-        applyColour(pixels, 255 * brightness, 255 * brightness, 0);
+        pixels.fill(pixels.Color(255 * brightness, 255 * brightness, 0));
     }
     else if (state == 3)
     {
         // Green
-        applyColour(pixels, 0, 255 * brightness, 0);
+        pixels.fill(pixels.Color(0, 255 * brightness, 0));
     }
     else if (state == 4)
     {
         // Cyan
-        applyColour(pixels, 0, 255 * brightness, 255 * brightness);
+        pixels.fill(pixels.Color(0, 255 * brightness, 255 * brightness));
     }
     else if (state == 5)
     {
         // Blue
-        applyColour(pixels, 0, 0, 255 * brightness);
+        pixels.fill(pixels.Color(0, 0, 255 * brightness));
     }
     else if (state == 6)
     {
         // Violet
-        applyColour(pixels, 255 * brightness, 0, 255 * brightness);
+        pixels.fill(pixels.Color(255 * brightness, 0, 255 * brightness));
     }
     else if (state == 7)
     {
         // White
-        applyColour(pixels, 255 * brightness, 255 * brightness, 255 * brightness);
+        pixels.fill(pixels.Color(255 * brightness, 255 * brightness, 255 * brightness));
+    }
+    pixels.show();
+    return;
+}
+
+void Rainbow(Adafruit_NeoPixel &pixels, double brightness, unsigned long wait)
+{
+    static long firstPixelHue = 0;
+    static unsigned long lastUpdate = 0;
+
+    if (millis() - lastUpdate >= wait)
+    {
+        lastUpdate = millis();
+        for (int i = 0; i < pixels.numPixels(); i++)
+        {
+            int pixelHue = firstPixelHue + (i * 65536L / pixels.numPixels());
+            uint32_t rawColor = pixels.ColorHSV(pixelHue);
+
+            uint8_t r = (rawColor >> 16) & 0xFF;
+            uint8_t g = (rawColor >> 8) & 0xFF;
+            uint8_t b = rawColor & 0xFF;
+
+            r = static_cast<uint8_t>(r * brightness);
+            g = static_cast<uint8_t>(g * brightness);
+            b = static_cast<uint8_t>(b * brightness);
+
+            pixels.setPixelColor(i, pixels.Color(r, g, b));
+        }
+        pixels.show();
+
+        firstPixelHue += 256;
+        if (firstPixelHue >= 5 * 65536)
+        {
+            firstPixelHue = 0;
+        }
     }
 
     return;
