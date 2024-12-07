@@ -1,13 +1,33 @@
 /*
-██╗░░░██╗░█████╗░██╗░░░░░██╗░░░░░███████╗███╗░░██╗████████╗██╗███╗░░██╗██╗░░░██╗
-██║░░░██║██╔══██╗██║░░░░░██║░░░░░██╔════╝████╗░██║╚══██╔══╝██║████╗░██║╚██╗░██╔╝
-╚██╗░██╔╝███████║██║░░░░░██║░░░░░█████╗░░██╔██╗██║░░░██║░░░██║██╔██╗██║░╚████╔╝░
-░╚████╔╝░██╔══██║██║░░░░░██║░░░░░██╔══╝░░██║╚████║░░░██║░░░██║██║╚████║░░╚██╔╝░░
-░░╚██╔╝░░██║░░██║███████╗███████╗███████╗██║░╚███║░░░██║░░░██║██║░╚███║░░░██║░░░
-░░░╚═╝░░░╚═╝░░╚═╝╚══════╝╚══════╝╚══════╝╚═╝░░╚══╝░░░╚═╝░░░╚═╝╚═╝░░╚══╝░░░╚═╝░░░
+██╗░░░██╗░█████╗░██╗░░░░░███████╗███╗░░██╗████████╗████████╗██╗███╗░░██╗██╗░░░██╗
+██║░░░██║██╔══██╗██║░░░░░██╔════╝████╗░██║╚══██╔══╝╚══██╔══╝██║████╗░██║╚██╗░██╔╝
+╚██╗░██╔╝███████║██║░░░░░█████╗░░██╔██╗██║░░░██║░░░░░░██║░░░██║██╔██╗██║░╚████╔╝░
+░╚████╔╝░██╔══██║██║░░░░░██╔══╝░░██║╚████║░░░██║░░░░░░██║░░░██║██║╚████║░░╚██╔╝░░
+░░╚██╔╝░░██║░░██║███████╗███████╗██║░╚███║░░░██║░░░░░░██║░░░██║██║░╚███║░░░██║░░░
+░░░╚═╝░░░╚═╝░░╚═╝╚══════╝╚══════╝╚═╝░░╚══╝░░░╚═╝░░░░░░╚═╝░░░╚═╝╚═╝░░╚══╝░░░╚═╝░░░
+
+    Valenttiny
+    Copyright (C) 2024  Behruz Erkinov
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
 */
 
 #include <Arduino.h>
+
+#include "Valenttiny_modes.h"
 
 // EEPROM
 #include <EEPROM.h>
@@ -110,31 +130,38 @@ void loop()
     }
     else if (state == 1)
     {
-        JustRED(pixels, brightness);
+        // Red
+        applyColour(pixels, 255 * brightness, 0, 0);
     }
     else if (state == 2)
     {
-        JustYellow(pixels, brightness);
+        // Yellow
+        applyColour(pixels, 255 * brightness, 255 * brightness, 0);
     }
     else if (state == 3)
     {
-        JustGreen(pixels, brightness);
+        // Green
+        applyColour(pixels, 0, 255 * brightness, 0);
     }
     else if (state == 4)
     {
-        JustCyan(pixels, brightness);
+        // Cyan
+        applyColour(pixels, 0, 255 * brightness, 255 * brightness);
     }
     else if (state == 5)
     {
-        JustBlue(pixels, brightness);
+        // Blue
+        applyColour(pixels, 0, 0, 255 * brightness);
     }
     else if (state == 6)
     {
-        JustViolet(pixels, brightness);
+        // Violet
+        applyColour(pixels, 255 * brightness, 0, 255 * brightness);
     }
     else if (state == 7)
     {
-        JustWhite(pixels, brightness);
+        // White
+        applyColour(pixels, 255 * brightness, 255 * brightness, 255 * brightness);
     }
 
     return;
