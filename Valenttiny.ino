@@ -19,8 +19,8 @@ Adafruit_NeoPixel pixels(NUMPIXELS, PIXELS_PIN, NEO_GRB + NEO_KHZ800);
 #define INTERRUPT_PIN_2 PCINT2
 #define BUTTON_1 PB1
 #define BUTTON_2 PB2
-Button button1(PB1, INPUT, HIGH);
-Button button2(PB1, INPUT, HIGH);
+Button button1(PB1, INPUT, LOW);
+Button button2(PB1, INPUT, LOW);
 
 void setup()
 {
