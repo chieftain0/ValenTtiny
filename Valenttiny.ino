@@ -95,7 +95,6 @@ void loop()
         {
             brightness = 1;
         }
-
         EEPROM.write(BRIGHTNESS_ADDRESS, brightness);
     }
 
@@ -106,7 +105,6 @@ void loop()
         {
             brightness = 0;
         }
-
         EEPROM.write(BRIGHTNESS_ADDRESS, brightness);
     }
 
@@ -185,5 +183,15 @@ void Rainbow(Adafruit_NeoPixel &pixels, double brightness, unsigned long wait)
         }
     }
 
+    return;
+}
+
+void goodDelay(unsigned long ms)
+{
+    unsigned long start = millis();
+    while (millis() - start < ms)
+    {
+        yield();
+    }
     return;
 }
