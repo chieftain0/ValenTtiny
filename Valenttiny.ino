@@ -33,10 +33,10 @@
 #define BRIGHTNESS_ADDRESS 2
 
 // LEDs
-#define NUMPIXELS 13
-#define PIXELS_PIN PB0
-#include <Adafruit_NeoPixel.h>
-Adafruit_NeoPixel pixels(NUMPIXELS, PIXELS_PIN, NEO_GRB + NEO_KHZ800);
+#include <FastLED.h>
+#define NUM_LEDS 13
+#define LED_PIN PB0
+CRGB LED[NUM_LEDS];
 
 // Buttons
 #define BUTTON_1_PIN PB1
@@ -51,9 +51,6 @@ double brightness = 0.5;
 
 void setup()
 {
-    pixels.begin();
-    pixels.clear();
-
     state = EEPROM.read(STATE_ADDRESS);
     brightness = EEPROM.read(BRIGHTNESS_ADDRESS);
     if (state >= NUM_STATES || state < 0)
@@ -64,6 +61,9 @@ void setup()
     {
         brightness = 0.5;
     }
+
+    FastLED.addLeds<WS2812B, LED_PIN, GRB>(LED, NUM_LEDS);
+    FastLED.setBrightness(brightness * 255);
 
     return;
 }
@@ -95,6 +95,7 @@ void loop()
         {
             brightness = 1;
         }
+        FastLED.setBrightness(brightness * 255);
         EEPROM.write(BRIGHTNESS_ADDRESS, brightness);
     }
 
@@ -105,91 +106,73 @@ void loop()
         {
             brightness = 0;
         }
+        FastLED.setBrightness(brightness * 255);
         EEPROM.write(BRIGHTNESS_ADDRESS, brightness);
     }
 
     if (state == 0)
     {
-        Rainbow(pixels, brightness, 10);
+        Rainbow(10);
     }
     else if (state == 1)
     {
         // Red
-        pixels.fill(pixels.Color(255 * brightness, 0, 0));
+        fill_solid(LED, NUM_LEDS, CRGB::Red);
     }
     else if (state == 2)
     {
         // Yellow
-        pixels.fill(pixels.Color(255 * brightness, 255 * brightness, 0));
+        fill_solid(LED, NUM_LEDS, CRGB::Yellow);
     }
     else if (state == 3)
     {
         // Green
-        pixels.fill(pixels.Color(0, 255 * brightness, 0));
+        fill_solid(LED, NUM_LEDS, CRGB::Green);
     }
     else if (state == 4)
     {
         // Cyan
-        pixels.fill(pixels.Color(0, 255 * brightness, 255 * brightness));
+        fill_solid(LED, NUM_LEDS, CRGB::Cyan);
     }
     else if (state == 5)
     {
         // Blue
-        pixels.fill(pixels.Color(0, 0, 255 * brightness));
+        fill_solid(LED, NUM_LEDS, CRGB::Blue);
     }
     else if (state == 6)
     {
         // Violet
-        pixels.fill(pixels.Color(255 * brightness, 0, 255 * brightness));
+        fill_solid(LED, NUM_LEDS, CRGB::Violet);
     }
     else if (state == 7)
     {
         // White
-        pixels.fill(pixels.Color(255 * brightness, 255 * brightness, 255 * brightness));
+        fill_solid(LED, NUM_LEDS, CRGB::White);
     }
-    pixels.show();
+
+    FastLED.show();
     return;
 }
 
-void Rainbow(Adafruit_NeoPixel &pixels, double brightness, unsigned long wait)
+void Rainbow(unsigned long wait)
 {
-    static long firstPixelHue = 0;
+    static uint8_t firstHue = 0;
     static unsigned long lastUpdate = 0;
 
     if (millis() - lastUpdate >= wait)
     {
         lastUpdate = millis();
-        for (int i = 0; i < pixels.numPixels(); i++)
-        {
-            int pixelHue = firstPixelHue + (i * 65536L / pixels.numPixels());
-            uint32_t rawColor = pixels.ColorHSV(pixelHue);
-
-            uint8_t r = (rawColor >> 16) & 0xFF;
-            uint8_t g = (rawColor >> 8) & 0xFF;
-            uint8_t b = rawColor & 0xFF;
-
-            r = static_cast<uint8_t>(r * brightness);
-            g = static_cast<uint8_t>(g * brightness);
-            b = static_cast<uint8_t>(b * brightness);
-
-            pixels.setPixelColor(i, pixels.Color(r, g, b));
-        }
-        pixels.show();
-
-        firstPixelHue += 256;
-        if (firstPixelHue >= 5 * 65536)
-        {
-            firstPixelHue = 0;
-        }
+        fill_rainbow(LED, NUM_LEDS, firstHue, 255 / NUM_LEDS);
+        firstHue += 1;
     }
 
     return;
 }
 
-void goodDelay(unsigned long ms)
+void goodDelay(unsigned long wait)
 {
     unsigned long start = millis();
-    while (millis() - start < ms)
+    while (millis() - start < wait)
     {
         yield();
     }
