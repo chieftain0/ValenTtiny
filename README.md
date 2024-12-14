@@ -1,3 +1,3 @@
 # Valenttiny
 
-[Wokwi project](https://wokwi.com/projects/340250901)
+[Wokwi project](https://wokwi.com/projects/416622139343298561)
