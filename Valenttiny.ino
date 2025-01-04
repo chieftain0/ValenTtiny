@@ -27,11 +27,6 @@
 
 #include <Arduino.h>
 
-// EEPROM
-#include <EEPROM.h>
-#define STATE_ADDRESS 0
-#define BRIGHTNESS_ADDRESS 2
-
 // LEDs
 #include <FastLED.h>
 #define NUM_LEDS 13
@@ -51,8 +46,6 @@ double brightness = 0.5;
 
 void setup()
 {
-    state = EEPROM.read(STATE_ADDRESS);
-    brightness = EEPROM.read(BRIGHTNESS_ADDRESS);
     if (state >= NUM_STATES || state < 0)
     {
         state = 0;
@@ -64,7 +57,6 @@ void setup()
 
     FastLED.addLeds<WS2812B, LED_PIN, GRB>(LED, NUM_LEDS);
     FastLED.setBrightness(brightness * 255);
-
     return;
 }
 
@@ -77,15 +69,11 @@ void loop()
     if (button1.click())
     {
         state = (state + 1) % NUM_STATES;
-
-        EEPROM.write(STATE_ADDRESS, state);
     }
 
     if (button2.click())
     {
         state = (state + NUM_STATES - 1) % NUM_STATES;
-
-        EEPROM.write(STATE_ADDRESS, state);
     }
 
     if (button1.step())
@@ -96,7 +84,6 @@ void loop()
             brightness = 1;
         }
         FastLED.setBrightness(brightness * 255);
-        EEPROM.write(BRIGHTNESS_ADDRESS, brightness);
     }
 
     if (button2.step())
@@ -107,7 +94,6 @@ void loop()
             brightness = 0;
         }
         FastLED.setBrightness(brightness * 255);
-        EEPROM.write(BRIGHTNESS_ADDRESS, brightness);
     }
 
     if (state == 0)
