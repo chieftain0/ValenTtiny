@@ -35,12 +35,12 @@
 // LEDs
 #include <FastLED.h>
 #define NUM_LEDS 13
-#define LED_PIN PB0
+#define LED_PIN 0
 CRGB LED[NUM_LEDS];
 
 // Buttons
-#define BUTTON_1_PIN PB1
-#define BUTTON_2_PIN PB2
+#define BUTTON_1_PIN 1
+#define BUTTON_2_PIN 2
 #include <EncButton.h>
 Button button1(BUTTON_1_PIN);
 Button button2(BUTTON_2_PIN);
