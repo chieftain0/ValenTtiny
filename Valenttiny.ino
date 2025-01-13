@@ -47,17 +47,7 @@ double brightness = 0.5;
 
 void setup()
 {
-    if (state >= NUM_STATES || state < 0)
-    {
-        state = 0;
-    }
-    if (brightness > 1 || brightness < 0)
-    {
-        brightness = 0.5;
-    }
-
     bitSet(LED_DDR, LED_BIT);
-    return;
 }
 
 void loop()
@@ -126,7 +116,6 @@ void loop()
     {
         showColor(255 * brightness, 255 * brightness, 255 * brightness);
     }
-    return;
 }
 
 void Rainbow(unsigned long wait)
