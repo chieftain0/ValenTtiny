@@ -7,7 +7,7 @@
 ░░░╚═╝░░░╚═╝░░╚═╝╚══════╝╚══════╝╚═╝░░╚══╝░░░╚═╝░░░░░░╚═╝░░░╚═╝╚═╝░░╚══╝░░░╚═╝░░░
 
     Valenttiny
-    Copyright (C) 2024  Behruz Erkinov
+    Copyright (C) 2024-2025  Behruz Erkinov
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -293,7 +293,6 @@ inline void sendBit(bool bitVal)
  * no additional operations are performed when passing the parameters to avoid
  * timing issues.
  */
-
 void sendColor(uint8_t r, uint8_t g, uint8_t b)
 {
     for (uint8_t bit = 0; bit < 8; bit++)
@@ -328,7 +327,6 @@ void sendColor(uint8_t r, uint8_t g, uint8_t b)
  *
  * @return None
  */
-
 void showColor(uint8_t r, uint8_t g, uint8_t b)
 {
 
