@@ -277,7 +277,7 @@ inline void sendBit(bool bitVal)
 }
 
 /**
- * Sends the specified RGB color to a single LED.
+ * @brief Sends the specified RGB color to a single LED.
  *
  * This function transmits the RGB values to an LED by sending each color
  * component bit by bit. It is crucial that the function executes with precise
@@ -314,9 +314,9 @@ void sendColor(uint8_t r, uint8_t g, uint8_t b)
 }
 
 /**
- * Sets all LEDs to the specified RGB color.
+ * @brief Sets all LEDs to the specified RGB color.
  *
- * This function sends the same color to all LEDs in the strip using the
+ * @details This function sends the same color to all LEDs in the strip using the
  * provided red, green, and blue intensity values (0-255). It disables
  * interrupts while updating the LEDs to ensure precise timing, then re-enables
  * interrupts after sending the color. A small delay is added at the end to
