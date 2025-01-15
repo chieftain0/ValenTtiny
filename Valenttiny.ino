@@ -41,6 +41,7 @@
 Button button1(BUTTON_1_PIN);
 Button button2(BUTTON_2_PIN);
 
+// Internal
 int state = 0;
 double brightness = 0.5;
 #define NUM_STATES 8
@@ -86,11 +87,11 @@ void loop()
 
     if (state == 0)
     {
-        Rainbow(10);
+        Rainbow(10, brightness);
     }
     else if (state == 1)
     {
-        showColor(255 * brightness * brightness, 0, 0);
+        showColor(255 * brightness, 0, 0);
     }
     else if (state == 2)
     {
@@ -118,22 +119,31 @@ void loop()
     }
 }
 
-void Rainbow(unsigned long wait)
+/**
+ * @brief Set the LEDs to a rainbow pattern
+ *
+ * @param[in] wait_ms Delay in milliseconds between each update
+ * @param[in] brightness Brightness of the LEDs (0.0 - 1.0)
+ */
+void Rainbow(unsigned long wait_ms, double brightness)
 {
     static uint8_t firstHue = 0;
     static unsigned long lastUpdate = 0;
 
-    if (millis() - lastUpdate >= wait)
+    if (millis() - lastUpdate >= wait_ms)
     {
         lastUpdate = millis();
         firstHue += 1;
 
         uint8_t colors[NUM_LEDS][3];
-
         for (int i = 0; i < NUM_LEDS; i++)
         {
             uint8_t hue = firstHue + (i * 255 / NUM_LEDS);
-            HSVtoRGB(hue, 255, 255 * brightness, colors[i][0], colors[i][1], colors[i][2]);
+            HSVtoRGB(hue, 255, 255, colors[i][0], colors[i][1], colors[i][2]);
+
+            colors[i][0] = colors[i][0] * brightness;
+            colors[i][1] = colors[i][1] * brightness;
+            colors[i][2] = colors[i][2] * brightness;
         }
 
         cli();
@@ -144,6 +154,19 @@ void Rainbow(unsigned long wait)
         sei();
     }
 }
+/**
+ * @brief Converts HSV color to RGB color
+ *
+ * @param h Hue in range of 0-255
+ * @param s Saturation in range of 0-255
+ * @param v Value in range of 0-255
+ *
+ * @param[in,out] r Red
+ * @param[in,out] g Green
+ * @param[in,out] b Blue
+ *
+ * @return None
+ */
 void HSVtoRGB(uint8_t h, uint8_t s, uint8_t v, uint8_t &r, uint8_t &g, uint8_t &b)
 {
     uint8_t region = h / 43;
@@ -200,6 +223,19 @@ void HSVtoRGB(uint8_t h, uint8_t s, uint8_t v, uint8_t &r, uint8_t &g, uint8_t &
 #define NS_PER_CYCLE (NS_PER_SEC / CYCLES_PER_SEC)
 #define NS_TO_CYCLES(n) ((n) / NS_PER_CYCLE)
 
+/**
+ * @brief Send a single bit over the WS2812B protocol
+ *
+ * @details This function sends a single bit over the WS2812B protocol using
+ *          bit-banging. It takes a boolean value as argument and sends a
+ *          logical 1 or 0 accordingly. The function uses the timing
+ *          definitions in the header file to generate the correct timing
+ *          for the protocol.
+ *
+ * @param[in] bitVal The value of the bit to be sent (true for 1, false for 0)
+ *
+ * @return None
+ */
 inline void sendBit(bool bitVal)
 {
     if (bitVal)
@@ -239,6 +275,25 @@ inline void sendBit(bool bitVal)
         );
     }
 }
+
+/**
+ * Sends the specified RGB color to a single LED.
+ *
+ * This function transmits the RGB values to an LED by sending each color
+ * component bit by bit. It is crucial that the function executes with precise
+ * timing to ensure the LED correctly interprets the data.
+ *
+ * @param r The red component of the color (0-255).
+ * @param g The green component of the color (0-255).
+ * @param b The blue component of the color (0-255).
+ *
+ * @return None
+ *
+ * @warning This function is time-sensitive down to the nanosecond. Ensure that
+ * no additional operations are performed when passing the parameters to avoid
+ * timing issues.
+ */
+
 void sendColor(uint8_t r, uint8_t g, uint8_t b)
 {
     for (uint8_t bit = 0; bit < 8; bit++)
@@ -257,6 +312,22 @@ void sendColor(uint8_t r, uint8_t g, uint8_t b)
         b <<= 1;
     }
 }
+
+/**
+ * Sets all LEDs to the specified RGB color.
+ *
+ * This function sends the same color to all LEDs in the strip using the
+ * provided red, green, and blue intensity values (0-255). It disables
+ * interrupts while updating the LEDs to ensure precise timing, then re-enables
+ * interrupts after sending the color. A small delay is added at the end to
+ * ensure the LEDs latch the color data.
+ *
+ * @param[in] r Red intensity (0-255).
+ * @param[in] g Green intensity (0-255).
+ * @param[in] b Blue intensity (0-255).
+ *
+ * @return None
+ */
 
 void showColor(uint8_t r, uint8_t g, uint8_t b)
 {
