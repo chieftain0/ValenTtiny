@@ -42,6 +42,10 @@
 
 ## Notes
 
+### SMD and TH
+
+- Although the ValenTtiny board consists mostly of through-hole components, the addressable LEDs in the original design are SMD to maintain a slim profile. In later versions, a through-hole 5 mm addressable LEDs option has been included in the [gerber](https://github.com/chieftain0/ValenTtiny/tree/main/gerber) folder.
+
 ### EasyHID
 
 - [EasyHID](https://github.com/GyverLibs/EasyHID.git) is a great open-source library for HID emulation, to which I have contributed to ensure compatibility with ATtiny85 and ValenTtiny boards. However, the provided sketch may be too large to fit into the ATtiny85 when including HID functionality, so you may need to reduce some features. On the positive side, this allows you to use your ValenTtiny board as a rubber ducky.
