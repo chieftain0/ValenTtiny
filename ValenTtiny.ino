@@ -125,7 +125,7 @@ void loop()
  * @param[in] wait_ms Delay in milliseconds between each update
  * @param[in] brightness Brightness of the LEDs (0.0 - 1.0)
  */
-void Rainbow(unsigned long wait_ms, double brightness)
+inline void Rainbow(unsigned long wait_ms, double brightness)
 {
     static uint8_t firstHue = 0;
     static unsigned long lastUpdate = 0;
@@ -157,9 +157,9 @@ void Rainbow(unsigned long wait_ms, double brightness)
 /**
  * @brief Converts HSV color to RGB color
  *
- * @param h Hue in range of 0-255
- * @param s Saturation in range of 0-255
- * @param v Value in range of 0-255
+ * @param[in] h Hue in range of 0-255
+ * @param[in] s Saturation in range of 0-255
+ * @param[in] v Value in range of 0-255
  *
  * @param[in,out] r Red
  * @param[in,out] g Green
@@ -167,7 +167,7 @@ void Rainbow(unsigned long wait_ms, double brightness)
  *
  * @return None
  */
-void HSVtoRGB(uint8_t h, uint8_t s, uint8_t v, uint8_t &r, uint8_t &g, uint8_t &b)
+inline void HSVtoRGB(uint8_t h, uint8_t s, uint8_t v, uint8_t &r, uint8_t &g, uint8_t &b)
 {
     uint8_t region = h / 43;
     uint8_t remainder = (h - (region * 43)) * 6;
@@ -283,9 +283,9 @@ inline void sendBit(bool bitVal)
  * component bit by bit. It is crucial that the function executes with precise
  * timing to ensure the LED correctly interprets the data.
  *
- * @param r The red component of the color (0-255).
- * @param g The green component of the color (0-255).
- * @param b The blue component of the color (0-255).
+ * @param[in] r The red component of the color (0-255).
+ * @param[in] g The green component of the color (0-255).
+ * @param[in] b The blue component of the color (0-255).
  *
  * @return None
  *
@@ -293,7 +293,7 @@ inline void sendBit(bool bitVal)
  * no additional operations are performed when passing the parameters to avoid
  * timing issues.
  */
-void sendColor(uint8_t r, uint8_t g, uint8_t b)
+inline void sendColor(uint8_t r, uint8_t g, uint8_t b)
 {
     for (uint8_t bit = 0; bit < 8; bit++)
     {
@@ -327,9 +327,8 @@ void sendColor(uint8_t r, uint8_t g, uint8_t b)
  *
  * @return None
  */
-void showColor(uint8_t r, uint8_t g, uint8_t b)
+inline void showColor(uint8_t r, uint8_t g, uint8_t b)
 {
-
     cli();
     for (int p = 0; p < NUM_LEDS; p++)
     {
