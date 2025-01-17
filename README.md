@@ -10,7 +10,7 @@
 
 - [USBasp](https://www.fischl.de/usbasp/)
 - [ValenTtiny PCB](https://github.com/chieftain0/ValenTtiny/tree/main/gerber)
-- [ATTiny85](https://www.microchip.com/en-us/product/attiny85)
+- [ATtiny85](https://www.microchip.com/en-us/product/attiny85)
 
 #### Software
 
@@ -34,6 +34,19 @@
     git clone https://github.com/chieftain0/ValenTtiny.git
     ```
 
-4. Load the ValenTtiny sketch onto the ATTiny85 using USBasp, or directly via onboard USB if Micronucleus was chosen.
+4. Install the required libraries using Arduino IDE's library manager.
 
-5. (Optional but recommended) Find a Valentine to share your creation with.
+5. Load the ValenTtiny sketch onto the ATTiny85 using USBasp, or directly via onboard USB if Micronucleus was chosen.
+
+6. (Optional but recommended) Find a Valentine to share your creation with.
+
+## Notes
+
+### EasyHID
+
+- [EasyHID](https://github.com/GyverLibs/EasyHID.git) is a great open-source library for HID emulation, to which I have contributed to ensure compatibility with ATtiny85 and ValenTtiny boards. However, the provided sketch may be too large to fit into the ATtiny85 when including HID functionality, so you may need to reduce some features. On the positive side, this allows you to use your ValenTtiny board as a rubber ducky.
+- To install EasyHID librare, navigate to your libraries folder and clone the repository:
+
+    ```bash
+    git clone https://github.com/GyverLibs/EasyHID.git
+    ```
