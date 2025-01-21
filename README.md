@@ -44,7 +44,7 @@
 
 ### SMD and TH
 
-- Although the ValenTtiny board consists mostly of through-hole components, the addressable LEDs in the original design are SMD to maintain a slim profile. In later versions, a through-hole 5 mm addressable LEDs option has been included in the [gerber](https://github.com/chieftain0/ValenTtiny/tree/main/gerber) folder.
+- Although the original ValenTtiny board consists mostly of through-hole components, the addressable LEDs in the original design are SMD to maintain a slim profile. In later versions, a through-hole 5 mm addressable LEDs option and almost all SMD component option have been included in the [gerber](https://github.com/chieftain0/ValenTtiny/tree/main/gerber) folder.
 
 ### EasyHID
 
