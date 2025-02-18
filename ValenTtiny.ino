@@ -35,15 +35,15 @@
 #define LED_BIT 0
 
 // Buttons
-#define BUTTON_1_PIN 1
-#define BUTTON_2_PIN 2
+#define BUTTON_1_PIN 2
+#define BUTTON_2_PIN 1
 #include <EncButton.h>
 Button button1(BUTTON_1_PIN);
 Button button2(BUTTON_2_PIN);
 
 // Internal
 int state = 0;
-double brightness = 0.2;
+double brightness = 0.05;
 #define NUM_STATES 8
 
 void setup()
@@ -69,7 +69,7 @@ void loop()
 
     if (button1.step())
     {
-        brightness = brightness + 0.1;
+        brightness = brightness + 0.05;
         if (brightness > 1)
         {
             brightness = 1;
@@ -78,7 +78,7 @@ void loop()
 
     if (button2.step())
     {
-        brightness = brightness - 0.1;
+        brightness = brightness - 0.05;
         if (brightness < 0)
         {
             brightness = 0;
