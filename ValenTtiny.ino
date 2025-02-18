@@ -29,7 +29,7 @@
 
 // LEDs
 #include <util/delay.h>
-#define NUM_LEDS 13
+#define NUM_LEDS 11
 #define LED_PORT PORTB
 #define LED_DDR DDRB
 #define LED_BIT 0
@@ -43,7 +43,7 @@ Button button2(BUTTON_2_PIN);
 
 // Internal
 int state = 0;
-double brightness = 0.5;
+double brightness = 0.2;
 #define NUM_STATES 8
 
 void setup()
