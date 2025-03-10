@@ -87,35 +87,35 @@ void loop()
 
     if (state == 0)
     {
-        Rainbow(10, brightness);
+        Rainbow(5, brightness);
     }
     else if (state == 1)
     {
-        showColor(255 * brightness, 0, 0);
+        FillUntil(255 * brightness, 0, 0, NUM_LEDS);
     }
     else if (state == 2)
     {
-        showColor(255 * brightness, 255 * brightness, 0);
+        FillUntil(255 * brightness, 255 * brightness, 0, NUM_LEDS);
     }
     else if (state == 3)
     {
-        showColor(0, 255 * brightness, 0);
+        FillUntil(0, 255 * brightness, 0, NUM_LEDS);
     }
     else if (state == 4)
     {
-        showColor(0, 255 * brightness, 255 * brightness);
+        FillUntil(0, 255 * brightness, 255 * brightness, NUM_LEDS);
     }
     else if (state == 5)
     {
-        showColor(0, 0, 255 * brightness);
+        FillUntil(0, 0, 255 * brightness, NUM_LEDS);
     }
     else if (state == 6)
     {
-        showColor(255 * brightness, 0, 255 * brightness);
+        FillUntil(255 * brightness, 0, 255 * brightness, NUM_LEDS);
     }
     else if (state == 7)
     {
-        showColor(255 * brightness, 255 * brightness, 255 * brightness);
+        FillUntil(255 * brightness, 255 * brightness, 255 * brightness, NUM_LEDS);
     }
 }
 
@@ -125,7 +125,7 @@ void loop()
  * @param[in] wait_ms Delay in milliseconds between each update
  * @param[in] brightness Brightness of the LEDs (0.0 - 1.0)
  */
-inline void Rainbow(unsigned long wait_ms, double brightness)
+void Rainbow(unsigned long wait_ms, double brightness)
 {
     static uint8_t firstHue = 0;
     static unsigned long lastUpdate = 0;
@@ -167,7 +167,7 @@ inline void Rainbow(unsigned long wait_ms, double brightness)
  *
  * @return None
  */
-inline void HSVtoRGB(uint8_t h, uint8_t s, uint8_t v, uint8_t &r, uint8_t &g, uint8_t &b)
+void HSVtoRGB(uint8_t h, uint8_t s, uint8_t v, uint8_t &r, uint8_t &g, uint8_t &b)
 {
     uint8_t region = h / 43;
     uint8_t remainder = (h - (region * 43)) * 6;
@@ -313,24 +313,27 @@ inline void sendColor(uint8_t r, uint8_t g, uint8_t b)
 }
 
 /**
- * @brief Sets all LEDs to the specified RGB color.
+ * @brief Fills the LEDs from the start of the strip up to a given number
+ *        with the specified color.
  *
- * @details This function sends the same color to all LEDs in the strip using the
- * provided red, green, and blue intensity values (0-255). It disables
- * interrupts while updating the LEDs to ensure precise timing, then re-enables
- * interrupts after sending the color. A small delay is added at the end to
- * ensure the LEDs latch the color data.
+ * @details This function sends the same color to the first num_led LEDs in
+ *          the strip using the provided red, green, and blue intensity values
+ *          (0-255). It disables interrupts while updating the LEDs to ensure
+ *          precise timing, then re-enables interrupts after sending the color.
+ *          A small delay is added at the end to ensure the LEDs latch the
+ *          color data.
  *
  * @param[in] r Red intensity (0-255).
  * @param[in] g Green intensity (0-255).
  * @param[in] b Blue intensity (0-255).
+ * @param[in] num_led The number of LEDs to fill.
  *
  * @return None
  */
-inline void showColor(uint8_t r, uint8_t g, uint8_t b)
+void FillUntil(uint8_t r, uint8_t g, uint8_t b, int num_led)
 {
     cli();
-    for (int p = 0; p < NUM_LEDS; p++)
+    for (int p = 0; p < num_led; p++)
     {
         sendColor(r, g, b);
     }
