@@ -54,3 +54,8 @@
     ```bash
     git clone https://github.com/GyverLibs/EasyHID.git
     ```
+
+## Credits
+
+- To [bigjosh](https://github.com/bigjosh/SimpleNeoPixelDemo) for the great tutorial on WS2812B protocol.
+- To [AlexGyver](https://github.com/GyverLibs/EasyHID) for the great open-source libraries.
