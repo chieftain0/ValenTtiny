@@ -42,8 +42,8 @@ Button button1(BUTTON_1_PIN);
 Button button2(BUTTON_2_PIN);
 
 // Internal
-int state = 0;
-double brightness = 0.05;
+uint8_t state = 0;
+uint8_t brightness = 5;
 #define NUM_STATES 8
 
 void setup()
@@ -69,17 +69,23 @@ void loop()
 
     if (button1.step())
     {
-        brightness = brightness + 0.05;
-        if (brightness > 1)
+        if (brightness <= 250)
         {
-            brightness = 1;
+            brightness += 5;
+        }
+        else
+        {
+            brightness = 255;
         }
     }
 
     if (button2.step())
     {
-        brightness = brightness - 0.05;
-        if (brightness < 0)
+        if (brightness >= 5)
+        {
+            brightness -= 5;
+        }
+        else
         {
             brightness = 0;
         }
@@ -91,31 +97,31 @@ void loop()
     }
     else if (state == 1)
     {
-        FillUntil(255 * brightness, 0, 0, NUM_LEDS);
+        FillUntil(brightness, 0, 0, NUM_LEDS);
     }
     else if (state == 2)
     {
-        FillUntil(255 * brightness, 255 * brightness, 0, NUM_LEDS);
+        FillUntil(brightness, brightness, 0, NUM_LEDS);
     }
     else if (state == 3)
     {
-        FillUntil(0, 255 * brightness, 0, NUM_LEDS);
+        FillUntil(0, brightness, 0, NUM_LEDS);
     }
     else if (state == 4)
     {
-        FillUntil(0, 255 * brightness, 255 * brightness, NUM_LEDS);
+        FillUntil(0, brightness, brightness, NUM_LEDS);
     }
     else if (state == 5)
     {
-        FillUntil(0, 0, 255 * brightness, NUM_LEDS);
+        FillUntil(0, 0, brightness, NUM_LEDS);
     }
     else if (state == 6)
     {
-        FillUntil(255 * brightness, 0, 255 * brightness, NUM_LEDS);
+        FillUntil(brightness, 0, brightness, NUM_LEDS);
     }
     else if (state == 7)
     {
-        FillUntil(255 * brightness, 255 * brightness, 255 * brightness, NUM_LEDS);
+        FillUntil(brightness, brightness, brightness, NUM_LEDS);
     }
 }
 
@@ -123,7 +129,7 @@ void loop()
  * @brief Set the LEDs to a rainbow pattern
  *
  * @param[in] wait_ms Delay in milliseconds between each update
- * @param[in] brightness Brightness of the LEDs (0.0 - 1.0)
+ * @param[in] brightness Brightness of the LEDs (0 - 255)
  */
 void Rainbow(unsigned long wait_ms, double brightness)
 {
@@ -141,9 +147,9 @@ void Rainbow(unsigned long wait_ms, double brightness)
             uint8_t hue = firstHue + (i * 255 / NUM_LEDS);
             HSVtoRGB(hue, 255, 255, colors[i][0], colors[i][1], colors[i][2]);
 
-            colors[i][0] = colors[i][0] * brightness;
-            colors[i][1] = colors[i][1] * brightness;
-            colors[i][2] = colors[i][2] * brightness;
+            colors[i][0] = (colors[i][0] * brightness + 127) / 255;
+            colors[i][1] = (colors[i][1] * brightness + 127) / 255;
+            colors[i][2] = (colors[i][2] * brightness + 127) / 255;
         }
 
         cli();
