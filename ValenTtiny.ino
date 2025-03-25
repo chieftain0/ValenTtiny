@@ -93,7 +93,7 @@ void loop()
 
     if (state == 0)
     {
-        Rainbow(5, brightness);
+        Rainbow(5, brightness, 0);
     }
     else if (state == 1)
     {
@@ -130,8 +130,9 @@ void loop()
  *
  * @param[in] wait_ms Delay in milliseconds between each update
  * @param[in] brightness Brightness of the LEDs (0 - 255)
+ * @param[in] gammaCorrect Apply gamma correction
  */
-void Rainbow(unsigned long wait_ms, double brightness)
+void Rainbow(unsigned long wait_ms, uint8_t brightness, bool gammaCorrect)
 {
     static uint8_t firstHue = 0;
     static unsigned long lastUpdate = 0;
@@ -144,12 +145,19 @@ void Rainbow(unsigned long wait_ms, double brightness)
         uint8_t colors[NUM_LEDS][3];
         for (int i = 0; i < NUM_LEDS; i++)
         {
-            uint8_t hue = firstHue + (i * 255 / NUM_LEDS);
+            uint8_t hue = firstHue + (i * 256 / NUM_LEDS);
             HSVtoRGB(hue, 255, 255, colors[i][0], colors[i][1], colors[i][2]);
 
             colors[i][0] = (colors[i][0] * brightness + 127) / 255;
             colors[i][1] = (colors[i][1] * brightness + 127) / 255;
             colors[i][2] = (colors[i][2] * brightness + 127) / 255;
+
+            if (gammaCorrect)
+            {
+                colors[i][0] = uint8_t(pow(colors[i][0] / 255.5, 2.2) * 255.5);
+                colors[i][1] = uint8_t(pow(colors[i][1] / 255.5, 2.2) * 255.5);
+                colors[i][2] = uint8_t(pow(colors[i][2] / 255.5, 2.2) * 255.5);
+            }
         }
 
         cli();
