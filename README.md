@@ -1,6 +1,6 @@
 # ValenTtiny
 
-[Wokwi Demo](https://wokwi.com/projects/416622139343298561)
+![img](https://github.com/user-attachments/assets/21ca7984-a101-4fee-82ae-66e409cca968)
 
 ## Installation
 
