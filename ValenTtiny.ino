@@ -64,7 +64,7 @@ void loop()
         state = (state + NUM_STATES - 1) % NUM_STATES;
     }
 
-    static uint32_t press_timer1 = 0, press_timer2 = 0;
+    static uint16_t press_timer1 = 0, press_timer2 = 0;
     const uint8_t press_action_delay = 250;
     if (press_map & (1 << 0) && (millis() - press_timer1 > press_action_delay))
     {
@@ -125,8 +125,24 @@ void loop()
     }
 }
 
+/**
+ * @brief Polls the buttons in the given array and stores the click and press states in the given pointers.
+ *
+ * @details This function is designed to be used in interrupt contexts. It stores the state of the buttons in the
+ *          given array and stores the click and press states in the given pointers. The function uses a static
+ *          array of timers to determine when a button has been pressed for longer than the given hold time.
+ *
+ * @param[in] button_pins Array of pins to poll.
+ * @param[in] num_buttons The number of buttons in the array.
+ * @param[in] press_state The state of the button when pressed (0 or 1).
+ * @param[in] hold_time The time in milliseconds to hold the button before it is considered a press.
+ * @param[out] click_mask A pointer to store the click states of the buttons.
+ * @param[out] press_mask A pointer to store the press states of the buttons.
+ *
+ * @return None
+ */
 inline void PollButtons(uint8_t *button_pins, uint8_t num_buttons, uint8_t press_state,
-                 uint32_t hold_time, uint8_t *click_mask, uint8_t *press_mask)
+                 uint16_t hold_time, uint8_t *click_mask, uint8_t *press_mask)
 {
     if (num_buttons > 8)
     {
@@ -134,7 +150,7 @@ inline void PollButtons(uint8_t *button_pins, uint8_t num_buttons, uint8_t press
     }
 
     static uint8_t button_flags = 0;
-    static uint32_t timers[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    static uint16_t timers[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     uint8_t clicks = 0, presses = 0;
 
     for (int i = 0; i < num_buttons; i++)
