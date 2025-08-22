@@ -36,6 +36,7 @@
 
 // Buttons
 #define CLICKvsPRESS_TIME 500
+#define PRESS_TO_ACTION_TIME 250
 #define BUTTON_1_PIN 2
 #define BUTTON_2_PIN 1
 const uint8_t buttonPins[] = {BUTTON_1_PIN, BUTTON_2_PIN};
@@ -55,18 +56,17 @@ void loop()
     uint8_t click_map = 0, press_map = 0;
     PollButtons((uint8_t *)buttonPins, sizeof(buttonPins) / sizeof(buttonPins[0]), LOW, CLICKvsPRESS_TIME, &click_map, &press_map);
 
-    if (click_map & (1 << 0))
+    if (click_map & 0b00000001)
     {
         state = (state + 1) % NUM_STATES;
     }
-    else if (click_map & (1 << 1))
+    else if (click_map & 0b00000010)
     {
         state = (state + NUM_STATES - 1) % NUM_STATES;
     }
 
-    static uint16_t press_timer1 = 0, press_timer2 = 0;
-    const uint8_t press_action_delay = 250;
-    if (press_map & (1 << 0) && (millis() - press_timer1 > press_action_delay))
+    static uint32_t  press_timer1 = 0, press_timer2 = 0;
+    if ((press_map & 0b00000001) && (millis() - press_timer1 > PRESS_TO_ACTION_TIME))
     {
         press_timer1 = millis();
         if (brightness <= 250)
@@ -78,7 +78,7 @@ void loop()
             brightness = 255;
         }
     }
-    else if (press_map & (1 << 1) && (millis() - press_timer2 > press_action_delay))
+    else if (press_map & 0b00000010 && (millis() - press_timer2 > PRESS_TO_ACTION_TIME))
     {
         press_timer2 = millis();
         if (brightness >= 5)
@@ -93,7 +93,7 @@ void loop()
 
     if (state == 0)
     {
-        Rainbow(5, brightness, 0);
+        Rainbow(5, brightness, 0, NUM_LEDS);
     }
     else if (state == 1)
     {
@@ -142,7 +142,7 @@ void loop()
  * @return None
  */
 inline void PollButtons(uint8_t *button_pins, uint8_t num_buttons, uint8_t press_state,
-                 uint16_t hold_time, uint8_t *click_mask, uint8_t *press_mask)
+                 uint32_t  hold_time, uint8_t *click_mask, uint8_t *press_mask)
 {
     if (num_buttons > 8)
     {
@@ -150,10 +150,10 @@ inline void PollButtons(uint8_t *button_pins, uint8_t num_buttons, uint8_t press
     }
 
     static uint8_t button_flags = 0;
-    static uint16_t timers[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    static uint32_t  timers[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     uint8_t clicks = 0, presses = 0;
 
-    for (int i = 0; i < num_buttons; i++)
+    for (uint8_t i = 0; i < num_buttons; i++)
     {
         uint8_t button_state = digitalRead(button_pins[i]);
 
@@ -187,8 +187,11 @@ inline void PollButtons(uint8_t *button_pins, uint8_t num_buttons, uint8_t press
  * @param[in] wait_ms Delay in milliseconds between each update
  * @param[in] brightness Brightness of the LEDs (0 - 255)
  * @param[in] gammaCorrect Apply gamma correction
+ * @param[in] num_leds Number of LEDs in the strip
+ * 
+ * @return None
  */
-inline void Rainbow(unsigned long wait_ms, uint8_t brightness, bool gammaCorrect)
+inline void Rainbow(unsigned long wait_ms, uint8_t brightness, bool gammaCorrect, uint8_t num_leds)
 {
     static uint8_t firstHue = 0;
     static unsigned long lastUpdate = 0;
@@ -198,10 +201,10 @@ inline void Rainbow(unsigned long wait_ms, uint8_t brightness, bool gammaCorrect
         lastUpdate = millis();
         firstHue += 1;
 
-        uint8_t colors[NUM_LEDS][3];
-        for (int i = 0; i < NUM_LEDS; i++)
+        uint8_t colors[num_leds][3];
+        for (uint8_t i = 0; i < num_leds; i++)
         {
-            uint8_t hue = firstHue + (i * 256 / NUM_LEDS);
+            uint8_t hue = firstHue + (i * 256 / num_leds);
             HSVtoRGB(hue, 255, 255, colors[i][0], colors[i][1], colors[i][2]);
 
             colors[i][0] = (colors[i][0] * brightness + 127) / 255;
@@ -217,7 +220,7 @@ inline void Rainbow(unsigned long wait_ms, uint8_t brightness, bool gammaCorrect
         }
 
         cli();
-        for (int i = 0; i < NUM_LEDS; i++)
+        for (uint8_t i = 0; i < num_leds; i++)
         {
             sendColor(colors[i][0], colors[i][1], colors[i][2]);
         }
@@ -367,18 +370,15 @@ inline void sendColor(uint8_t r, uint8_t g, uint8_t b)
 {
     for (uint8_t bit = 0; bit < 8; bit++)
     {
-        sendBit(bitRead(g, 7));
-        g <<= 1;
+        sendBit(g & (0b10000000 >> bit));
     }
     for (uint8_t bit = 0; bit < 8; bit++)
     {
-        sendBit(bitRead(r, 7));
-        r <<= 1;
+        sendBit(r & (0b10000000 >> bit));
     }
     for (uint8_t bit = 0; bit < 8; bit++)
     {
-        sendBit(bitRead(b, 7));
-        b <<= 1;
+        sendBit(b & (0b10000000 >> bit));
     }
 }
 
@@ -396,14 +396,14 @@ inline void sendColor(uint8_t r, uint8_t g, uint8_t b)
  * @param[in] r Red intensity (0-255).
  * @param[in] g Green intensity (0-255).
  * @param[in] b Blue intensity (0-255).
- * @param[in] num_led The number of LEDs to fill.
+ * @param[in] num_led The number of LEDs to fill (up to 256).
  *
  * @return None
  */
-inline void FillUntil(uint8_t r, uint8_t g, uint8_t b, int num_led)
+inline void FillUntil(uint8_t r, uint8_t g, uint8_t b, uint8_t num_led)
 {
     cli();
-    for (int p = 0; p < num_led; p++)
+    for (uint8_t p = 0; p < num_led; p++)
     {
         sendColor(r, g, b);
     }
