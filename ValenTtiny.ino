@@ -35,11 +35,10 @@
 #define LED_BIT 0
 
 // Buttons
+#define CLICKvsPRESS_TIME 500
 #define BUTTON_1_PIN 2
 #define BUTTON_2_PIN 1
-#include <EncButton.h>
-Button button1(BUTTON_1_PIN);
-Button button2(BUTTON_2_PIN);
+const uint8_t buttonPins[] = {BUTTON_1_PIN, BUTTON_2_PIN};
 
 // Internal
 uint8_t state = 0;
@@ -53,22 +52,23 @@ void setup()
 
 void loop()
 {
+    uint8_t click_map = 0, press_map = 0;
+    PollButtons((uint8_t *)buttonPins, sizeof(buttonPins) / sizeof(buttonPins[0]), LOW, CLICKvsPRESS_TIME, &click_map, &press_map);
 
-    button1.tick();
-    button2.tick();
-
-    if (button1.click())
+    if (click_map & (1 << 0))
     {
         state = (state + 1) % NUM_STATES;
     }
-
-    if (button2.click())
+    else if (click_map & (1 << 1))
     {
         state = (state + NUM_STATES - 1) % NUM_STATES;
     }
 
-    if (button1.step())
+    static uint32_t press_timer1 = 0, press_timer2 = 0;
+    const uint8_t press_action_delay = 250;
+    if (press_map & (1 << 0) && (millis() - press_timer1 > press_action_delay))
     {
+        press_timer1 = millis();
         if (brightness <= 250)
         {
             brightness += 5;
@@ -78,9 +78,9 @@ void loop()
             brightness = 255;
         }
     }
-
-    if (button2.step())
+    else if (press_map & (1 << 1) && (millis() - press_timer2 > press_action_delay))
     {
+        press_timer2 = millis();
         if (brightness >= 5)
         {
             brightness -= 5;
@@ -125,6 +125,46 @@ void loop()
     }
 }
 
+inline void PollButtons(uint8_t *button_pins, uint8_t num_buttons, uint8_t press_state,
+                 uint32_t hold_time, uint8_t *click_mask, uint8_t *press_mask)
+{
+    if (num_buttons > 8)
+    {
+        return;
+    }
+
+    static uint8_t button_flags = 0;
+    static uint32_t timers[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    uint8_t clicks = 0, presses = 0;
+
+    for (int i = 0; i < num_buttons; i++)
+    {
+        uint8_t button_state = digitalRead(button_pins[i]);
+
+        if (button_state == press_state && (button_flags & (1 << i)) == 0)
+        {
+            timers[i] = millis();
+            button_flags |= 1 << i;
+        }
+        else if (button_state != press_state && (button_flags & (1 << i)) != 0)
+        {
+            if (millis() - timers[i] < hold_time)
+            {
+                clicks |= 1 << i;
+            }
+            button_flags &= ~(1 << i);
+        }
+
+        if ((button_flags & (1 << i)) && (millis() - timers[i] >= hold_time))
+        {
+            presses |= (1 << i);
+        }
+    }
+
+    *click_mask = clicks;
+    *press_mask = presses;
+}
+
 /**
  * @brief Set the LEDs to a rainbow pattern
  *
@@ -132,7 +172,7 @@ void loop()
  * @param[in] brightness Brightness of the LEDs (0 - 255)
  * @param[in] gammaCorrect Apply gamma correction
  */
-void Rainbow(unsigned long wait_ms, uint8_t brightness, bool gammaCorrect)
+inline void Rainbow(unsigned long wait_ms, uint8_t brightness, bool gammaCorrect)
 {
     static uint8_t firstHue = 0;
     static unsigned long lastUpdate = 0;
@@ -168,6 +208,7 @@ void Rainbow(unsigned long wait_ms, uint8_t brightness, bool gammaCorrect)
         sei();
     }
 }
+
 /**
  * @brief Converts HSV color to RGB color
  *
@@ -181,7 +222,7 @@ void Rainbow(unsigned long wait_ms, uint8_t brightness, bool gammaCorrect)
  *
  * @return None
  */
-void HSVtoRGB(uint8_t h, uint8_t s, uint8_t v, uint8_t &r, uint8_t &g, uint8_t &b)
+inline void HSVtoRGB(uint8_t h, uint8_t s, uint8_t v, uint8_t &r, uint8_t &g, uint8_t &b)
 {
     uint8_t region = h / 43;
     uint8_t remainder = (h - (region * 43)) * 6;
@@ -343,7 +384,7 @@ inline void sendColor(uint8_t r, uint8_t g, uint8_t b)
  *
  * @return None
  */
-void FillUntil(uint8_t r, uint8_t g, uint8_t b, int num_led)
+inline void FillUntil(uint8_t r, uint8_t g, uint8_t b, int num_led)
 {
     cli();
     for (int p = 0; p < num_led; p++)
