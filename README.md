@@ -44,7 +44,7 @@
 
 - ### SMD and TH
 
-  - Although the original legacy ValenTtiny board consists mostly of through-hole components, the addressable LEDs in the design are SMD to maintain a slim profile. Current version is SMD-only.
+  - Although the legacy ValenTtiny board consists mostly of through-hole components, the addressable LEDs in the design are SMD to maintain a slim profile. Current version is SMD-only.
 
 - ### EasyHID
 

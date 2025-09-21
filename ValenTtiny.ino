@@ -65,7 +65,7 @@ void loop()
         state = (state + NUM_STATES - 1) % NUM_STATES;
     }
 
-    static uint32_t  press_timer1 = 0, press_timer2 = 0;
+    static uint32_t press_timer1 = 0, press_timer2 = 0;
     if ((press_map & 0b00000001) && (millis() - press_timer1 > PRESS_TO_ACTION_TIME))
     {
         press_timer1 = millis();
@@ -142,7 +142,7 @@ void loop()
  * @return None
  */
 inline void PollButtons(uint8_t *button_pins, uint8_t num_buttons, uint8_t press_state,
-                 uint32_t  hold_time, uint8_t *click_mask, uint8_t *press_mask)
+                        uint32_t hold_time, uint8_t *click_mask, uint8_t *press_mask)
 {
     if (num_buttons > 8)
     {
@@ -150,7 +150,7 @@ inline void PollButtons(uint8_t *button_pins, uint8_t num_buttons, uint8_t press
     }
 
     static uint8_t button_flags = 0;
-    static uint32_t  timers[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    static uint32_t timers[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     uint8_t clicks = 0, presses = 0;
 
     for (uint8_t i = 0; i < num_buttons; i++)
@@ -188,7 +188,7 @@ inline void PollButtons(uint8_t *button_pins, uint8_t num_buttons, uint8_t press
  * @param[in] brightness Brightness of the LEDs (0 - 255)
  * @param[in] gammaCorrect Apply gamma correction
  * @param[in] num_leds Number of LEDs in the strip
- * 
+ *
  * @return None
  */
 inline void Rainbow(unsigned long wait_ms, uint8_t brightness, bool gammaCorrect, uint8_t num_leds)
