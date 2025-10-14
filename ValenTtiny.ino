@@ -286,8 +286,9 @@ inline void HSVtoRGB(uint8_t h, uint8_t s, uint8_t v, uint8_t &r, uint8_t &g, ui
 }
 
 #define T1H 900
-#define T1L 600
-#define T0H 400
+#define T1L 500
+
+#define T0H 500
 #define T0L 900
 
 #define RES 250000
